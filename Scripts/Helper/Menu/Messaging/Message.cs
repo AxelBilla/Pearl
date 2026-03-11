@@ -1,5 +1,6 @@
 using System;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class Message : Window, IClickable {
@@ -9,18 +10,17 @@ public class Message : Window, IClickable {
     TMP_Text content;
 
     Button context;
-    Selector options;
+    [SerializeField] Selector options; // i.e, "Delete" & "Edit" options, common to all messages from user
 
-    void Start(){
-        SetUI();
+    public void Set(Message.Data data){
+        Set(data.username, data.timestamp, data.content);
     }
+    public void Set(string username, long timestamp, string content){
+        SetUI();
 
-    public void Set(string username, float timestamp, string content, Selector options = null){
         this.username.text = username;
         this.timestamp.text = TimestampToDate(timestamp);
         this.content.text = content;
-
-        if(options!=null) this.options = options;
     }
 
     public override void SetUI(){
@@ -40,11 +40,22 @@ public class Message : Window, IClickable {
         else options.Show();
     }
 
-    public static string TimestampToDate(float timestamp)
+    public static string TimestampToDate(long timestamp)
     {
         // Unix timestamp is seconds past epoch
         DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Local);
-        dateTime = dateTime.AddSeconds((double)timestamp).ToLocalTime();
-        return dateTime.ToString();
+        dateTime = dateTime.AddMilliseconds((double)timestamp).ToLocalTime();
+        return dateTime.ToString("dd:mm:yyyy HH:mm:ss");
+    }
+
+    public class Data{
+        public string username;
+        public long timestamp;
+        public string content;
+        public Data(string username, long timestamp, string content){
+            this.username = username;
+            this.timestamp = timestamp;
+            this.content = content;
+        }
     }
 }

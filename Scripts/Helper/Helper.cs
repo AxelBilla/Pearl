@@ -31,7 +31,7 @@ public class Helper : Window, IClickable {
     }
 
     public void OnClick(){
-        if(Window.active_windows.Count>1 && Window.active_windows.Contains(this)) {
+        if(Window.active_windows.Count>0) {
             Window[] windows = new Window[Window.active_windows.Count];
             Window.active_windows.CopyTo(windows);
             foreach (Window window in windows) {

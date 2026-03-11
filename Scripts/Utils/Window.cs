@@ -14,12 +14,17 @@ public abstract class Window : MonoBehaviour {
     public void Show(){
         this.gameObject.SetActive(true);
         active_windows.Add(this);
+        Show_ExtendedBehaviour();
     }
+    public virtual void Show_ExtendedBehaviour(){return;}
 
     public void Hide(){
+        Hide_ExtendedBehaviour();
         active_windows.Remove(this);
         this.gameObject.SetActive(false);
     }
+    public virtual void Hide_ExtendedBehaviour(){return;}
+
 
     public static void Show(GameObject obj){
         obj.SetActive(true);

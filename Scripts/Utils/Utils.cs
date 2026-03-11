@@ -7,6 +7,11 @@ public static class Path{
         public static string Folder = "Prefabs/";
         public static string Button = Path.Prefabs.Folder+"Button";
 
+        public static class Messaging{
+            public static string Folder = Path.Prefabs.Folder+"Messaging/";
+            public static string Message = Path.Prefabs.Messaging.Folder+"Message";
+        }
+
     }
 }
 
