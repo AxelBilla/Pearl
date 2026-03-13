@@ -4,13 +4,21 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public abstract class Window : MonoBehaviour {
+public class Window : MonoBehaviour {
     public static HashSet<Window> active_windows = new HashSet<Window>();
+
+    void Awake(){
+        SetUI();
+    }
 
     public bool IsVisible(){
         return this.gameObject.activeSelf;
     }
 
+    public void Alternate(){
+        if(this.gameObject.activeSelf) Hide();
+        else Show();
+    }
     public void Show(){
         this.gameObject.SetActive(true);
         active_windows.Add(this);
@@ -120,5 +128,5 @@ public abstract class Window : MonoBehaviour {
         yield break;
     }
 
-    public abstract void SetUI();
+    public virtual void SetUI(){}
 }

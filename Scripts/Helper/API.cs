@@ -1,37 +1,81 @@
+using System;
+using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.Networking;
+
 public static class API {
-    private static string address;
-    private static int port;
+    public static class Request{
 
-    public static string user = "N/A";
-    private static string password;
+        // Read
+        public static async Task<string> Get(API.Information info, string endpoint)
+        {
+            return await Send(Request.Type.GET, endpoint, "", info.user, info.password, info.address, info.port);
+        }
+
+        // Content = JSON
+        // Create
+        public static async Task<string> Post(API.Information info, string endpoint, string content)
+        {
+            return await Send(Request.Type.POST, endpoint, content, info.user, info.password, info.address, info.port);
+        }
+        // Update
+        public static async Task<string> Put(API.Information info, string endpoint, string content)
+        {
+            return await Send(Request.Type.PUT, endpoint, content, info.user, info.password, info.address, info.port);
+        }
+        // Delete
+        public static async Task<string> Delete(API.Information info, string endpoint, string content)
+        {
+            return await Send(Request.Type.DELETE, endpoint, content, info.user, info.password, info.address, info.port);
+        }
+
+        private static async Task<string> Send(Request.Type method, string endpoint, string content, string user, string password, string url, int port = -1){
+
+            if(port!=-1) url+=":"+port;
+
+            if(url[url.Length-1]!='/') url+='/';
+            url+=endpoint;
+
+            UnityWebRequest request = new UnityWebRequest(url, method.ToString());
+            DownloadHandlerBuffer dH = new DownloadHandlerBuffer();
+            request.downloadHandler = dH;
+
+            string auth = $"user:\"{user}\", password:\"${password}\"";
+
+            request.SetRequestHeader("User-Agent", "User agent");
+            request.SetRequestHeader("Authorization", "Basic " + Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(auth)));
+            if(content!="") {
+                request.SetRequestHeader("Content-Type", "application/json");
+                UploadHandlerRaw uH = new UploadHandlerRaw(System.Text.Encoding.ASCII.GetBytes(content));
+                request.uploadHandler = uH;
+            }
+
+            await request.SendWebRequest();
+
+            if(request.error!=null) return request.error;
+            else return request.downloadHandler.text;
+
+        }
 
 
-    public static class Create {
-        public static bool Message(Message.Data message) {
-            // Add message to DB via API call
-            return true;
+        public enum Type{
+            GET,
+            DELETE,
+            PUT,
+            POST,
         }
     }
 
-    public static class Read {
-        public static Message.Data[] Messages() {
-            //string messages = ""; // Get JSON from API call
-            //return JSON.Get<Message.Data[]>(messages);
-            return null;
-        }
-    }
+    [Serializable]
+    public class Information{
+        public string address = "localhost";
+        public int port = -1;
 
-    public static class Update {
-        public static bool Message(Message.Data message) {
-            // Update message from DB via API call
-            return true;
-        }
-    }
+        public string user = "";
+        public string password = "";
 
-    public static class Delete {
-        public static bool Message(Message.Data message) {
-            // Delete message from DB via API call
-            return true;
+        public override string ToString(){
+            return "{"+$"address:\"{address}\", port:\"{port}\", user:\"{user}\", password:\"{password}\""+"}";
         }
     }
 }

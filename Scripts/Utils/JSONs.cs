@@ -26,11 +26,11 @@ public static class JSON{
         return Get(entry.ToString(), key);
     }
     public static T Deserialize<T>(string file) {
-        //try {
+        try {
             return JsonConvert.DeserializeObject<T>(file);
-        //} catch{
-        //    return default;
-        //}
+        } catch{
+            return default;
+        }
     }
     public static object Deserialize(string file, Type type) {
         try {

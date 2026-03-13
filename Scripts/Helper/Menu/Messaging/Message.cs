@@ -7,9 +7,9 @@ public class Message : Window, IClickable {
 
     TMP_Text username;
     TMP_Text timestamp;
-    TMP_Text content;
+    public TMP_Text content;
 
-    Button context;
+    public Button context;
     [SerializeField] Selector options; // i.e, "Delete" & "Edit" options, common to all messages from user
 
     public void Set(Message.Data data){
@@ -21,6 +21,12 @@ public class Message : Window, IClickable {
         this.username.text = username;
         this.timestamp.text = TimestampToDate(timestamp);
         this.content.text = content;
+
+        this.content.ForceMeshUpdate();
+        if(this.content.isTextOverflowing) {
+            float height = this.content.textInfo.lineInfo[0].lineHeight*(this.content.textInfo.lineCount);
+            this.context.image.rectTransform.sizeDelta = new Vector2(this.context.image.rectTransform.sizeDelta.x, height);
+        }
     }
 
     public override void SetUI(){
@@ -43,6 +49,8 @@ public class Message : Window, IClickable {
     public static string TimestampToDate(long timestamp)
     {
         // Unix timestamp is seconds past epoch
+        if(timestamp<0) return "";
+
         DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Local);
         dateTime = dateTime.AddMilliseconds((double)timestamp).ToLocalTime();
         return dateTime.ToString("dd:mm:yyyy HH:mm:ss");
@@ -56,6 +64,10 @@ public class Message : Window, IClickable {
             this.username = username;
             this.timestamp = timestamp;
             this.content = content;
+        }
+
+        public override string ToString(){
+            return "{"+$"username: \"{this.username}\", timestamp: {this.timestamp}, content: \"{this.content}\""+"}";
         }
     }
 }

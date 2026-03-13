@@ -11,7 +11,6 @@ public class Selector : Window {
     GameObject buttons;
 
     void Start(){
-        SetUI();
         Hide();
     }
     public override void SetUI(){
