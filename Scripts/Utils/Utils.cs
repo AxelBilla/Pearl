@@ -13,6 +13,9 @@ public static class Path{
         }
 
     }
+    public static class Custom{
+        public static string Folder = "./Apps/";
+    }
 }
 
 public class Utils {

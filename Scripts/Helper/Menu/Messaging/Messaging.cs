@@ -19,6 +19,9 @@ public class Messaging : Menu {
     private TMP_InputField input;
     private Button send;
 
+    public Window options;
+    public Message.Data options_current;
+
     private Message.Data[] messages;
     [SerializeField] private API.Information API_ACCESS = default;
 
@@ -46,6 +49,12 @@ public class Messaging : Menu {
         this.drag_area = this.GetComponentInChildren<Image>();
 
         this.config_window = this.GetComponentsInChildren<Window>()[1];
+
+        this.options = this.GetComponentsInChildren<Window>()[2];
+        Button[] option_buttons = this.options.GetComponentsInChildren<Button>();
+        option_buttons[0].onClick.AddListener(Delete);
+        option_buttons[1].onClick.AddListener(Edit);
+        this.options.Hide();
 
         TMP_InputField[] config_inputs = this.config_window.GetComponentsInChildren<TMP_InputField>();
         this.config_address = config_inputs[0];
@@ -87,6 +96,24 @@ public class Messaging : Menu {
 
 
             yield return new WaitForSecondsRealtime(0.1f);
+        }
+    }
+    private IEnumerator CheckForMetadata(){
+        while(true){
+            Task<API.Information.Metadata> req = Request.Read.Metadata(API_ACCESS);
+            while(!req.IsCompleted) yield return null;
+            API.Information.Metadata meta = req.Result;
+
+            if(meta!=null) {
+                if (API_ACCESS.metadata == null) {
+                    API_ACCESS.metadata = meta;
+                }
+                else if (API_ACCESS.metadata.id != meta.id) {
+                    API_ACCESS.metadata = meta;
+                }
+            }
+
+            yield return new WaitForSecondsRealtime(1f);
         }
     }
 
@@ -134,7 +161,10 @@ public class Messaging : Menu {
         GameObject new_tab = Instantiate(prefab, this.message_tabs.content);
 
         // Set message data
-        new_tab.GetComponent<Message>().Set(tab_message);
+        new_tab.GetComponent<Message>().Set(tab_message, this);
+        if(API_ACCESS.metadata!=null) {
+            if(API_ACCESS.metadata.id!=tab_message.user_id) new_tab.GetComponent<Button>().interactable = false;
+        }
         return new_tab;
     }
 
@@ -149,19 +179,53 @@ public class Messaging : Menu {
     }
 
     private void Send(){
-        Add(this.input.text);
-        this.input.text = "";
+        if(this.input.text != "") {
+            this.message_tabs.verticalNormalizedPosition = 0f;
+            if(waiting_for_update==null) Add(this.input.text);
+            else{
+                waiting_for_update.content = this.input.text;
+                Edit();
+            }
+            this.input.text = "";
+        }
     }
 
     private void Add(string text){
         long timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-        Message.Data new_message = new Message.Data(API_ACCESS.user, timestamp, text);
+        Message.Data new_message = new Message.Data("", API_ACCESS.user, text, timestamp, timestamp, "");
 
         Request.Create.Message(API_ACCESS, new_message);
     }
 
+    public void Delete(){
+        if(this.options.IsVisible()) this.options.Hide();
+        if(this.waiting_for_update!=null){
+            this.input.text = "";
+            this.waiting_for_update = null;
+        }
+
+        Request.Delete.Message(API_ACCESS, options_current);
+        options_current = null;
+    }
+
+    private Message.Data waiting_for_update = null;
+    public void Edit(){
+        if(this.options.IsVisible()) this.options.Hide();
+
+        if(waiting_for_update==null || waiting_for_update!=options_current) {
+            waiting_for_update = options_current;
+            this.input.text = options_current.content;
+        }
+        else {
+            options_current = null;
+            Request.Update.Message(API_ACCESS, waiting_for_update);
+            waiting_for_update = null;
+        }
+    }
+
     public override void Show_ExtendedBehaviour(){
         StartCoroutine(WaitForUpdate());
+        StartCoroutine(CheckForMetadata());
         StartCoroutine(Drag());
     }
     public override void Hide_ExtendedBehaviour(){
@@ -172,43 +236,26 @@ public class Messaging : Menu {
 
 
     private static class Request {
+
         public static class Create {
             public static async Task<string> Message(API.Information info, Message.Data message) {
-                return await API.Request.Post(info,"Message", message.ToString());
+                return await API.Request.Post(info,"message", message.ToString());
             }
         }
 
         public static class Read {
-            public static async Task<Message.Data[]> Messages(API.Information info) {
-                if(info.address == "localhost") {
-                    string msg = "["+
-                    (new Message.Data("Tester", 0, "1.").ToString()+",")+
-                    (new Message.Data("Tester", 0, "2.").ToString()+",")+
-                    (new Message.Data("Tester", 0, "3.").ToString()+",")+
-                    (new Message.Data("Tester", 0, "4.").ToString()+",")+
-                    (new Message.Data("Tester", 0, "5.").ToString()+",")+
-                    (new Message.Data("Tester", 0, "6.").ToString()+",")+
-                    (new Message.Data("Tester", 0, "7.").ToString()+",")+
-                    (new Message.Data("Tester", 0, "8.").ToString()+",")+
-                    (new Message.Data("Tester", 0, "9.").ToString()+",")+
-                    (new Message.Data("Tester", 0, "10.").ToString()+",")+
-                    (new Message.Data("Tester", 0, "11.").ToString()+",")+
-                    (new Message.Data("Tester", 0, "12.").ToString()+",")+
-                    (new Message.Data("Tester", 0, "13.").ToString()+",")+
-                    (new Message.Data("Tester", 0, "14.").ToString()+",")+
-                    (new Message.Data("Tester", 0, "15.").ToString()+",")+
-                    (new Message.Data("Tester", 0, "16.").ToString()+",")+
-                    (new Message.Data("Tester", 0, "17.").ToString()+",")+
-                    (new Message.Data("Tester", 0, "18.").ToString()+",")+
-                    ((UnityEngine.Random.Range(0, 60) > 30) ? new Message.Data("Dos", 10000, "Oh\nshit").ToString() : "")+
-                    "]";
-                    return JSON.Get<Message.Data[]>(msg);
-                }
-
+            public static async Task<API.Information.Metadata> Metadata(API.Information info){
                 string res = await API.Request.Get(info, "");
+                API.Information.Metadata meta= JSON.Get<API.Information.Metadata>(res);
+                return meta;
+            }
+
+            public static async Task<Message.Data[]> Messages(API.Information info) {
+                string res = await API.Request.Get(info, "message");
                 Message.Data[] messages = JSON.Get<Message.Data[]>(res);
 
-                if(messages==null) messages = new Message.Data[]{new Message.Data("ERROR", -1, res)};
+                if(messages==null) messages = new Message.Data[]{new Message.Data("", "ERROR", res, -1, -1, "")};
+                else if(messages.Length==0) messages = new Message.Data[]{new Message.Data("", "", "Be the first to talk!", -1, -1, "")};
 
                 return messages;
             }
@@ -216,13 +263,13 @@ public class Messaging : Menu {
 
         public static class Update {
             public static async Task<string> Message(API.Information info, Message.Data message) {
-                return await API.Request.Put(info, "Message", message.ToString());
+                return await API.Request.Put(info, "message", message.ToString());
             }
         }
 
         public static class Delete {
             public static async Task<string> Message(API.Information info, Message.Data message) {
-                return await API.Request.Delete(info, "Message", message.ToString());
+                return await API.Request.Delete(info, "message", message.ToString());
             }
         }
 

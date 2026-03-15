@@ -40,7 +40,7 @@ public static class API {
             DownloadHandlerBuffer dH = new DownloadHandlerBuffer();
             request.downloadHandler = dH;
 
-            string auth = $"user:\"{user}\", password:\"${password}\"";
+            string auth = "{"+$"\"username\":\"{user}\", \"password\":\"{password}\""+"}";
 
             request.SetRequestHeader("User-Agent", "User agent");
             request.SetRequestHeader("Authorization", "Basic " + Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(auth)));
@@ -50,13 +50,21 @@ public static class API {
                 request.uploadHandler = uH;
             }
 
+            request.certificateHandler = new BypassCertificate();
             await request.SendWebRequest();
 
             if(request.error!=null) return request.error;
             else return request.downloadHandler.text;
-
         }
 
+        public class BypassCertificate : CertificateHandler
+        {
+            protected override bool ValidateCertificate(byte[] certificateData)
+            {
+                // Always returns true, indicating that the certificate is valid
+                return true;
+            }
+        }
 
         public enum Type{
             GET,
@@ -74,8 +82,15 @@ public static class API {
         public string user = "";
         public string password = "";
 
+        public Metadata metadata = null;
+
         public override string ToString(){
             return "{"+$"address:\"{address}\", port:\"{port}\", user:\"{user}\", password:\"{password}\""+"}";
+        }
+
+        public class Metadata{
+            public string id = "";
+            public bool is_admin = false;
         }
     }
 }

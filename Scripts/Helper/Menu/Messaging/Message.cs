@@ -1,21 +1,26 @@
 using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Message : Window, IClickable {
 
+    public Messaging parent;
+
     TMP_Text username;
     TMP_Text timestamp;
     public TMP_Text content;
 
     public Button context;
-    [SerializeField] Selector options; // i.e, "Delete" & "Edit" options, common to all messages from user
 
-    public void Set(Message.Data data){
-        Set(data.username, data.timestamp, data.content);
+    Message.Data data = null;
+    public void Set(Message.Data data, Messaging parent = null){
+        this.data = data;
+        Set(data.username, data.timestamp, data.content, parent);
     }
-    public void Set(string username, long timestamp, string content){
+    public void Set(string username, long timestamp, string content, Messaging parent = null){
+        this.parent = parent;
         SetUI();
 
         this.username.text = username;
@@ -38,12 +43,56 @@ public class Message : Window, IClickable {
 
         this.context = this.GetComponent<Button>();
 
-        this.context.onClick.AddListener(()=>{OnClick();});
+        StartCoroutine(OnClick());
     }
 
-    public void OnClick(){
-        if(options.IsVisible()) options.Hide();
-        else options.Show();
+    private static float timer = 0f;
+    private static Button[] option_buttons = null;
+    public IEnumerator OnClick(){
+        Vector3 origin_pos = this.context.transform.localPosition;
+        while(true){
+            while(timer>0f){
+                timer-=Time.unscaledDeltaTime;
+                yield return null;
+            }
+            if(parent!=null && this.context.interactable) {
+                if(option_buttons==null) option_buttons = parent.options.GetComponentsInChildren<Button>();
+
+                if (IsHovering(this.context) && (!IsHovering(option_buttons[0]) && !IsHovering(option_buttons[1]))) {
+                    if(Actions.Cursor.Click() > 0f){
+                        if (parent.options_current != this.data) {
+                            parent.options_current = this.data;
+                        }
+
+                        if (parent.options.IsVisible() && parent.options_current == this.data) parent.options.Hide();
+                        else {
+                            parent.options.Show();
+                            parent.options_current = this.data;
+                            parent.options.transform.position = Actions.Cursor.Position();
+                        }
+                        timer = 0.5f;
+                        yield break;
+                    }
+                }
+            }
+            yield return null;
+        }
+    }
+
+    private static bool IsHovering(Button hoverable){
+        if(!hoverable.IsActive()) return false;
+
+        Vector3 cursor_pos = Actions.Cursor.Position();
+        Vector2 object_size = (hoverable.GetComponent<RectTransform>().sizeDelta);
+
+        // corners
+        float left = hoverable.transform.position.x-object_size.x;
+        float right = hoverable.transform.position.x+object_size.x;
+
+        float bottom = hoverable.transform.position.y-object_size.y;
+        float top = hoverable.transform.position.y+object_size.y;
+
+        return ((cursor_pos.x>=left && cursor_pos.x<=right) && (cursor_pos.y>=bottom && cursor_pos.y<=top));
     }
 
     public static string TimestampToDate(long timestamp)
@@ -57,17 +106,23 @@ public class Message : Window, IClickable {
     }
 
     public class Data{
+        public string id;
         public string username;
-        public long timestamp;
         public string content;
-        public Data(string username, long timestamp, string content){
+        public long timestamp;
+        public long last_update;
+        public string user_id;
+        public Data(string id, string username, string content, long timestamp, long last_update, string user_id){
+            this.id = id;
             this.username = username;
-            this.timestamp = timestamp;
             this.content = content;
+            this.timestamp = timestamp;
+            this.last_update = last_update;
+            this.user_id = user_id;
         }
 
         public override string ToString(){
-            return "{"+$"username: \"{this.username}\", timestamp: {this.timestamp}, content: \"{this.content}\""+"}";
+            return "{"+$"\"id\": \"{this.id}\", \"username\": \"{this.username}\", \"content\": \"{this.content}\", \"timestamp\": {this.timestamp}, \"last_update\": {this.last_update}, \"user_id\": \"{this.user_id}\""+"}";
         }
     }
 }

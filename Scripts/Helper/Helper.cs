@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,10 +28,10 @@ public class Helper : Window, IClickable {
         this.icon = this.canva.transform.GetChild(0).GetComponent<Button>();
         this.options = this.canva.transform.GetChild(1).GetComponent<Selector>();
 
-        this.icon.onClick.AddListener(()=>{OnClick();});
+        this.icon.onClick.AddListener(()=>{StartCoroutine(OnClick());});
     }
 
-    public void OnClick(){
+    public IEnumerator OnClick(){
         if(Window.active_windows.Count>0) {
             Window[] windows = new Window[Window.active_windows.Count];
             Window.active_windows.CopyTo(windows);
@@ -42,6 +43,7 @@ public class Helper : Window, IClickable {
             options.Show();
             options.transform.position = icon.transform.position + (Vector3.left*this.icon.image.sprite.bounds.max.x*1000f*2f);
         }
+        yield break;
     }
 
 }
