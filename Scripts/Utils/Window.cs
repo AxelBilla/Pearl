@@ -37,6 +37,8 @@ public class Window : MonoBehaviour {
 
 
     public static void Show(GameObject obj){
+        Window win = obj.GetComponent<Window>();
+        if(win!=null) active_windows.Add(win);
         obj.SetActive(true);
     }
     public static void Show(params GameObject[] objects){
@@ -47,6 +49,8 @@ public class Window : MonoBehaviour {
 
     public static void Hide(GameObject obj){
         obj.SetActive(false);
+        Window win = obj.GetComponent<Window>();
+        if(win!=null) active_windows.Remove(win);
     }
     public static void Hide(params GameObject[] objects){
         foreach (GameObject obj in objects){

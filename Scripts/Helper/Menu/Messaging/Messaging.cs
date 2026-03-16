@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Threading.Tasks;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,7 +24,7 @@ public class Messaging : Menu {
     public Message.Data options_current;
 
     private Message.Data[] messages;
-    [SerializeField] private API.Information API_ACCESS = default;
+    [SerializeField] public API.Information API_ACCESS = default;
 
     void Start(){
         Hide();
@@ -54,6 +55,7 @@ public class Messaging : Menu {
         Button[] option_buttons = this.options.GetComponentsInChildren<Button>();
         option_buttons[0].onClick.AddListener(Delete);
         option_buttons[1].onClick.AddListener(Edit);
+        option_buttons[2].onClick.AddListener(Copy);
         this.options.Hide();
 
         TMP_InputField[] config_inputs = this.config_window.GetComponentsInChildren<TMP_InputField>();
@@ -162,9 +164,6 @@ public class Messaging : Menu {
 
         // Set message data
         new_tab.GetComponent<Message>().Set(tab_message, this);
-        if(API_ACCESS.metadata!=null) {
-            if(API_ACCESS.metadata.id!=tab_message.user_id) new_tab.GetComponent<Button>().interactable = false;
-        }
         return new_tab;
     }
 
@@ -198,29 +197,41 @@ public class Messaging : Menu {
     }
 
     public void Delete(){
-        if(this.options.IsVisible()) this.options.Hide();
+        OnOptionsOpen();
         if(this.waiting_for_update!=null){
             this.input.text = "";
-            this.waiting_for_update = null;
         }
 
         Request.Delete.Message(API_ACCESS, options_current);
-        options_current = null;
+
+        OnOptionsClose();
     }
 
     private Message.Data waiting_for_update = null;
     public void Edit(){
-        if(this.options.IsVisible()) this.options.Hide();
+        OnOptionsOpen();
 
-        if(waiting_for_update==null || waiting_for_update!=options_current) {
+        if(waiting_for_update==null) {
             waiting_for_update = options_current;
             this.input.text = options_current.content;
         }
         else {
-            options_current = null;
             Request.Update.Message(API_ACCESS, waiting_for_update);
-            waiting_for_update = null;
+            OnOptionsClose();
         }
+    }
+
+    public void Copy(){
+        OnOptionsOpen();
+        EditorGUIUtility.systemCopyBuffer = options_current.content;
+    }
+
+    private void OnOptionsClose(){
+        this.waiting_for_update = null;
+        this.options_current = null;
+    }
+    private void OnOptionsOpen(){
+        if(this.options.IsVisible()) this.options.Hide();
     }
 
     public override void Show_ExtendedBehaviour(){

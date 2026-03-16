@@ -58,7 +58,14 @@ public class Message : Window, IClickable {
             if(parent!=null && this.context.interactable) {
                 if(option_buttons==null) option_buttons = parent.options.GetComponentsInChildren<Button>();
 
-                if (IsHovering(this.context) && (!IsHovering(option_buttons[0]) && !IsHovering(option_buttons[1]))) {
+                bool is_hovering_options = false;
+                foreach (Button option in option_buttons){
+                    if(IsHovering(option)){
+                        is_hovering_options = true;
+                        break;
+                    }
+                }
+                if (IsHovering(this.context) && (!is_hovering_options)) {
                     if(Actions.Cursor.Click() > 0f){
                         if (parent.options_current != this.data) {
                             parent.options_current = this.data;
@@ -67,6 +74,17 @@ public class Message : Window, IClickable {
                         if (parent.options.IsVisible() && parent.options_current == this.data) parent.options.Hide();
                         else {
                             parent.options.Show();
+                            if(parent.API_ACCESS!=null) {
+                                if (parent.API_ACCESS.metadata.id != this.data.user_id) {
+                                    Hide(option_buttons[0].gameObject);
+                                    Hide(option_buttons[1].gameObject);
+                                }
+                                else {
+                                    Show(option_buttons[0].gameObject);
+                                    Show(option_buttons[1].gameObject);
+                                }
+                            }
+
                             parent.options_current = this.data;
                             parent.options.transform.position = Actions.Cursor.Position();
                         }
@@ -83,7 +101,7 @@ public class Message : Window, IClickable {
         if(!hoverable.IsActive()) return false;
 
         Vector3 cursor_pos = Actions.Cursor.Position();
-        Vector2 object_size = (hoverable.GetComponent<RectTransform>().sizeDelta);
+        Vector2 object_size = (hoverable.GetComponent<RectTransform>().sizeDelta/2f);
 
         // corners
         float left = hoverable.transform.position.x-object_size.x;
