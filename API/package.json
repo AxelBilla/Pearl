@@ -1,6 +1,7 @@
 {
   "type": "module",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "express": "^5.1.0",
     "node": "^25.1.0",
     "postgres": "^3.4.7"

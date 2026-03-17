@@ -1,6 +1,11 @@
 import postgres from 'postgres'
 import crypto from 'crypto';
 
+
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const bcrypt = require('bcrypt');
+
 const sql = postgres({
     host                 : 'localhost',            // Postgres ip address[s] or domain name[s]
     port                 : 5432,          // Postgres server port[s]
@@ -10,70 +15,85 @@ const sql = postgres({
 })
 export class Database{
     static Get = class{
-        static async Table(table, order_by, limit=20){
-            if(limit!=-1) {
-                return await sql`
-                    SELECT *
-                    FROM ${sql(table)}
-                    ORDER BY ${sql(order_by)} DESC
-                `
-            } else {
-                return await sql`
-                    SELECT * FROM ${sql(table)}
-                    ORDER BY ${sql(order_by)} DESC
-                `
+        static async Table(table, order_by, limit = 20, condition){
+            if(condition!=null){
+                if(limit>0){
+                    return await sql`
+                        SELECT *
+                        FROM ${sql(table)}
+                        WHERE ${sql(condition.property)} = ${condition.value}
+                        ORDER BY ${sql(order_by)} DESC LIMIT ${limit}
+                        `
+                }
+                else
+                {
+                    return await sql`
+                        SELECT *
+                        FROM ${sql(table)}
+                        WHERE ${sql(condition.property)} = ${condition.value}
+                        ORDER BY ${sql(order_by)} DESC
+                        `
+                }
             }
+            else{
+                if(limit>0) {
+                    return await sql`
+                        SELECT *
+                        FROM ${sql(table)}
+                        ORDER BY ${sql(order_by)} DESC LIMIT ${limit}
+                    `
+                } else {
+                    return await sql`
+                        SELECT * FROM ${sql(table)}
+                        ORDER BY ${sql(order_by)} DESC
+                    `
+                }
+            }
+        }
+        static async Field(table, field, condition){
+            return await sql`
+                SELECT ${sql(field)}
+                FROM ${sql(table)}
+                WHERE ${sql(condition.property)} = ${condition.value}
+            `
         }
 
         static async Access(auth){
-            console.log(auth);
-            let res = await sql`
-                SELECT EXISTS(
-                    SELECT username FROM users
-                    WHERE username = ${auth.username} AND password = ${auth.password}
-                )
-                `
-            return res[0].exists;
+            const users = await Database.Get.Field("users", "password", new Pair("username", auth.username));
+            for(let user in users){
+                if(bcrypt.compare(auth.password, users[user].password)) return true;
+            }
+            return false;
         }
-
         static async ID(auth){
-            let res = await sql`    
-                SELECT id FROM users
-                WHERE username = ${auth.username} AND password = ${auth.password}
-                `
-            return res[0].id;
+            const users = await Database.Get.Table("users", "id", -1, new Pair("username", auth.username));
+            for(let user in users){
+                if(bcrypt.compare(auth.password, users[user].password)) return users[user].id;
+            }
+            return null;
         }
         static async Name(id){
-            let res = await sql`    
-                SELECT username FROM users
-                WHERE id = ${id}
-                `
-            return res[0].username;
+            return (Database.Get.Field("users", "username", new Pair("id", id)))[0];
         }
         static async Admin(id){
-            let res = await sql`
-                SELECT EXISTS(
-                    SELECT id FROM admins
-                    WHERE id = ${id}
-                )
-                `
-            return res[0].exists;
-
+            const admins = await Database.Get.Field("admins", "id", new Pair("id", id));
+            return (admins.length>0);
         }
 
     }
     static Delete = class{
-        static async Entry(table, owner, pair, is_admin){
+        static async Entry(table, owner, condition, is_admin){
             if(is_admin){
+                console.log(condition)
                 await sql`
                     DELETE  FROM ${sql(table)}
-                    WHERE ${sql(pair.property)} = ${pair.value}
+                    WHERE ${sql(condition.property)} = ${condition.value}
                 `
             }
             else{
                 await sql`
                     DELETE  FROM ${sql(table)}
-                    WHERE ${sql(pair.property)} = ${pair.value}
+                    WHERE ${sql(condition.property)} = ${condition.value}
                     AND ${sql(owner.property)} = ${owner.value}
                 `
             }
@@ -82,7 +102,6 @@ export class Database{
     }
     static Update = class{
         static async Entry(table, owner, condition, data, is_admin){
-            console.log(data);
             if(is_admin){
                 await sql`
                     UPDATE ${sql(table)}
@@ -102,13 +121,14 @@ export class Database{
 
     }
     static Create = class{
-        static async Entry(table, data){
+        static async Entry(table, data, custom_id = "id"){
 
-            data.id = ID.Generate();
+            if(custom_id!=null && custom_id!=="") data[custom_id] = ID.Generate();
 
             await sql`
                     INSERT INTO ${sql(table)} ${sql(data)}
-                `
+                `;
+            return data;
         }
 
     }

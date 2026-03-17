@@ -2,9 +2,14 @@ import { Database } from './db.connect.js';
 
 export class Authentication{
     static ToJSON(headers){
+        try{
         let auth = headers.authorization;
         auth = auth.split(" ")[1]; 
         return JSON.parse(atob(auth));
+        }
+        catch{
+            return null;
+        }
     }
     static async HasAccess(auth){
         return await Database.Get.Access(auth);
