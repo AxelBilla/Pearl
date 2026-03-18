@@ -73,7 +73,7 @@ export class Database{
             return null;
         }
         static async Name(id){
-            return (Database.Get.Field("users", "username", new Pair("id", id)))[0];
+            return (await Database.Get.Field("users", "username", new Pair("id", id)))[0].username;
         }
         static async Admin(id){
             const admins = await Database.Get.Field("admins", "id", new Pair("id", id));
@@ -84,7 +84,6 @@ export class Database{
     static Delete = class{
         static async Entry(table, owner, condition, is_admin){
             if(is_admin){
-                console.log(condition)
                 await sql`
                     DELETE  FROM ${sql(table)}
                     WHERE ${sql(condition.property)} = ${condition.value}
@@ -98,7 +97,6 @@ export class Database{
                 `
             }
         }
-
     }
     static Update = class{
         static async Entry(table, owner, condition, data, is_admin){
@@ -117,6 +115,7 @@ export class Database{
                     AND ${sql(owner.property)} = ${owner.value}
                 `
             }
+            return data;
         }
 
     }

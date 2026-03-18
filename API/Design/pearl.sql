@@ -31,6 +31,7 @@ CREATE TABLE Messages(
    ID VARCHAR(50),
    Content VARCHAR(1000),
    Timestamp Timestamp,
+   last_update Timestamp,
    user_id VARCHAR(50) NOT NULL,
    PRIMARY KEY(ID),
    FOREIGN KEY(user_id) REFERENCES Users(ID)

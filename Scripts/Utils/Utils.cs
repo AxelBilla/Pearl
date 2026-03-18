@@ -11,6 +11,10 @@ public static class Path{
             public static string Folder = Path.Prefabs.Folder+"Messaging/";
             public static string Message = Path.Prefabs.Messaging.Folder+"Message";
         }
+        public static class Newsletter{
+            public static string Folder = Path.Prefabs.Folder+"Newsletter/";
+            public static string Article = Path.Prefabs.Newsletter.Folder+"Article";
+        }
 
     }
     public static class Custom{

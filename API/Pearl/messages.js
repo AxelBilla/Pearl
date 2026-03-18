@@ -12,7 +12,6 @@ export class Messages{
         return message_list;
     }
     static async Create(body, auth){
-        console.log(body);
         const id = await Database.Get.ID(auth);
     
         const data = {

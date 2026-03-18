@@ -31,7 +31,7 @@ public static class API {
 
         private static async Task<string> Send(Request.Type method, string endpoint, string content, string user, string password, string url, int port = -1){
 
-            if(port!=-1) url+=":"+port;
+            if(port>0) url+=":"+port;
 
             if(url[url.Length-1]!='/') url+='/';
             url+=endpoint;

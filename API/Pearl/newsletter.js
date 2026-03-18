@@ -5,7 +5,6 @@ export class Newsletter{
         let articles = await Database.Get.Table("articles", "timestamp", -1);
         for(let index in articles){
             articles[index].timestamp = new Date(articles[index].timestamp).getTime();
-            articles[index].last_update = new Date(articles[index].last_update).getTime();
             articles[index].category = (await Database.Get.Table("categories", "id", -1, new Pair("id", articles[index].category_id)))[0].name;
 
             const source_id = articles[index].source;
@@ -14,12 +13,16 @@ export class Newsletter{
             let sources = [];
             for(let link in links){
                 let source = (await Database.Get.Table("sources", "id", -1, new Pair("id", links[link].source_id)))[0]; 
+                source.link = links[link].link;
                 delete source.id;
 
                 sources.push(source);
             }
 
             articles[index].sources = sources;
+
+            delete articles[index].admin_id;
+            delete articles[index].category_id;
         }
         return articles;
     }
@@ -30,22 +33,32 @@ export class Newsletter{
         const is_admin = await Database.Get.Admin(id);
         if(!is_admin) return null;
         
+        let category = (await Database.Get.Field("categories", "id", new Pair("name", body.category)))[0];
+        if(category==null){
+            category = await Database.Create.Entry("categories", {name: body.category});
+        }
+
         const data = {
             "content": body.content,
             "timestamp": Date.now(),
-            "category_id": (await Database.Get.Field("categories", "id", new Pair("name", body.category)))[0].id,
+            "category_id": category.id,
             "admin_id": id
         };      
 
         const entry = await Database.Create.Entry("articles", data);
         if(body.sources!=null){
             for(let source in body.sources){
-                    const data_source = {
-                        "link": body.sources[source].link,
-                        "article_id": entry.id,
-                        "source_id": (await Database.Get.Field("sources", "id", new Pair("name", body.sources[source].name)))[0].id,
-                    }
-                    await Database.Create.Entry("links", data_source, null);
+                let source_entry = (await Database.Get.Field("sources", "id", new Pair("name", body.sources[source].name)))[0];
+                if(source_entry==null){
+                    source_entry = await Database.Create.Entry("sources", {name: body.sources[source].name, score: 0});
+                }
+
+                const data_source = {
+                    "link": body.sources[source].link,
+                    "article_id": entry.id,
+                    "source_id": source_entry.id,
+                }
+                await Database.Create.Entry("links", data_source, null);
             }
         }
         return entry;
@@ -74,4 +87,5 @@ export class Newsletter{
         await Database.Delete.Entry("links", null, new Pair("article_id", body.id), is_admin);
         return Database.Delete.Entry("articles", null, condition, is_admin);
     }
+    
 }

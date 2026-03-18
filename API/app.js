@@ -75,6 +75,7 @@ app.delete('/message', async function(req, res){
 
 
 app.get('/newsletter', async function(req, res){
+
   let auth = Authentication.ToJSON(req.headers);
   let has_access = await Authentication.HasAccess(auth);
 
@@ -82,9 +83,10 @@ app.get('/newsletter', async function(req, res){
   res.json(exec);
 })
 app.post('/newsletter', async function(req, res){
+
   let auth = Authentication.ToJSON(req.headers);
   let has_access = await Authentication.HasAccess(auth);
-
+  
   const exec = (has_access) ? await Newsletter.Create(req.body, auth) : "[401]: Unauthorized Access";
   res.json(exec);
 })
