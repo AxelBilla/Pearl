@@ -67,14 +67,14 @@ public class Message : Window, IClickable {
                 }
                 if (IsHovering(this.context) && (!is_hovering_options)) {
                     if(Actions.Cursor.Click() > 0f){
-                        if (parent.options_current != this.data) {
-                            parent.options_current = this.data;
-                        }
 
-                        if (parent.options.IsVisible() && parent.options_current == this.data) parent.options.Hide();
+                        bool is_same = (parent.options_current!=null && this.data!=null);
+                        if(is_same) is_same = (parent.options_current.ToString()==this.data.ToString());
+
+                        if (parent.options.IsVisible() && is_same) parent.options.Hide();
                         else {
                             parent.options.Show();
-                            if(parent.API_ACCESS!=null) {
+                            if(parent.API_ACCESS!=null && parent.API_ACCESS.metadata!=null) {
                                 if (parent.API_ACCESS.metadata.id != this.data.user_id) {
                                     Hide(option_buttons[0].gameObject);
                                     Hide(option_buttons[1].gameObject);

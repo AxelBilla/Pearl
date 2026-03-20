@@ -1,6 +1,8 @@
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class Helper : Window, IClickable {
@@ -20,6 +22,7 @@ public class Helper : Window, IClickable {
         SetUI();
 
         options.Hide();
+        StartCoroutine(CanClick());
     }
 
     public override void SetUI(){
@@ -44,6 +47,21 @@ public class Helper : Window, IClickable {
             options.transform.position = icon.transform.position + (Vector3.left*this.icon.image.sprite.bounds.max.x*1000f*2f);
         }
         yield break;
+    }
+
+    private IEnumerator CanClick(){
+        while(true) {
+            var eventData = new PointerEventData(EventSystem.current);
+            eventData.position = Actions.Cursor.Position();
+            List<RaycastResult> results = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(eventData, results);
+
+            #if !UNITY_EDITOR
+            Desktopia.Windows.Main.SetClickThrough(results.Count<=0);
+            #endif
+
+            yield return new WaitForEndOfFrame();
+        }
     }
 
 }

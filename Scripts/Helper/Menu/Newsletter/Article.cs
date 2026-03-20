@@ -70,11 +70,13 @@ public class Article : Window, IClickable {
                 }
                 if (IsHovering(this.context) && (!is_hovering_options)) {
                     if(Actions.Cursor.Click() > 0f){
-                        if (parent.options_current != this.data) {
-                            parent.options_current = this.data;
-                        }
 
-                        if (parent.options.IsVisible() && parent.options_current == this.data) parent.options.Hide();
+                        bool is_same = (parent.options_current!=null && this.data!=null);
+                        if(is_same) is_same = (parent.options_current.ToString()==this.data.ToString());
+
+                        Debug.Log(parent.options.IsVisible());
+                        Debug.Log(is_same);
+                        if (parent.options.IsVisible() && is_same) parent.options.Hide();
                         else {
                             parent.options.Show();
                             parent.options_current = this.data;

@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Threading.Tasks;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -223,7 +222,7 @@ public class Messaging : Menu {
 
     public void Copy(){
         OnOptionsOpen();
-        EditorGUIUtility.systemCopyBuffer = options_current.content;
+        GUIUtility.systemCopyBuffer = options_current.content;
     }
 
     private void OnOptionsClose(){
