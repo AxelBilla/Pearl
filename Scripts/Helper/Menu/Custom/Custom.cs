@@ -20,7 +20,7 @@ public class Custom : Window{
         if(!Directory.Exists(Path.Custom.Folder)) Directory.CreateDirectory(Path.Custom.Folder);
         else{
             foreach (string file_name in Directory.GetFiles(Path.Custom.Folder)){
-                string[] file = File.ReadAllLines(Path.Custom.Folder+file_name);
+                string[] file = File.ReadAllLines(file_name);
                 if(file.Length>2) continue;
 
                 string name = Regex.Match(file[0], @"(?<=name\s*=\s*)(\S).*").ToString();

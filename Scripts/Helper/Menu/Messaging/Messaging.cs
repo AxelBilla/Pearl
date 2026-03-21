@@ -23,7 +23,7 @@ public class Messaging : Menu {
     public Message.Data options_current;
 
     private Message.Data[] messages;
-    [SerializeField] public API.Information API_ACCESS = default;
+    [SerializeField] public API.Information API_ACCESS;
 
     void Start(){
         Hide();

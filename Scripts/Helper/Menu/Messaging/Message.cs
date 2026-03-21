@@ -24,7 +24,7 @@ public class Message : Window, IClickable {
         SetUI();
 
         this.username.text = username;
-        this.timestamp.text = TimestampToDate(timestamp);
+        this.timestamp.text = Utils.TimestampToDate(timestamp);
         this.content.text = content;
 
         this.content.ForceMeshUpdate();
@@ -60,12 +60,12 @@ public class Message : Window, IClickable {
 
                 bool is_hovering_options = false;
                 foreach (Button option in option_buttons){
-                    if(IsHovering(option)){
+                    if(Utils.IsHovering(option)){
                         is_hovering_options = true;
                         break;
                     }
                 }
-                if (IsHovering(this.context) && (!is_hovering_options)) {
+                if (Utils.IsHovering(this.context) && (!is_hovering_options)) {
                     if(Actions.Cursor.Click() > 0f){
 
                         bool is_same = (parent.options_current!=null && this.data!=null);
@@ -95,32 +95,6 @@ public class Message : Window, IClickable {
             }
             yield return null;
         }
-    }
-
-    private static bool IsHovering(Button hoverable){
-        if(!hoverable.IsActive()) return false;
-
-        Vector3 cursor_pos = Actions.Cursor.Position();
-        Vector2 object_size = (hoverable.GetComponent<RectTransform>().sizeDelta/2f);
-
-        // corners
-        float left = hoverable.transform.position.x-object_size.x;
-        float right = hoverable.transform.position.x+object_size.x;
-
-        float bottom = hoverable.transform.position.y-object_size.y;
-        float top = hoverable.transform.position.y+object_size.y;
-
-        return ((cursor_pos.x>=left && cursor_pos.x<=right) && (cursor_pos.y>=bottom && cursor_pos.y<=top));
-    }
-
-    public static string TimestampToDate(long timestamp)
-    {
-        // Unix timestamp is seconds past epoch
-        if(timestamp<0) return "";
-
-        DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Local);
-        dateTime = dateTime.AddMilliseconds((double)timestamp).ToLocalTime();
-        return dateTime.ToString("dd:mm:yyyy HH:mm:ss");
     }
 
     public class Data{

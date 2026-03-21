@@ -74,8 +74,8 @@ public static class API {
         }
     }
 
-    [Serializable]
-    public class Information{
+    [CreateAssetMenu(fileName = "Information", menuName = "Pearl/API/Information")]
+    public class Information : ScriptableObject{
         public string address = "localhost";
         public int port = -1;
 

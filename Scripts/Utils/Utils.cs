@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public static class Path{
     public static class Prefabs{
@@ -59,28 +61,36 @@ public class Utils {
         Rotate(target, end_rotation, speed);
     }
 
-    public static bool isFacing(Transform obj, Transform target, float angle = 0.7f)
-    {
-        Vector3 forwardPos = obj.forward;
-        Vector3 distanceToTarget = (target.position - obj.position).normalized;
-
-        return (Vector3.Dot(forwardPos, distanceToTarget) >= angle); // returns True or False, depending on if the target is in front or not
-    }
-
-    public static float GetDistance(Vector3 start, Vector3 end){
-        Vector3 distance = (start-end);
-        float result = (distance.x>0) ? distance.x : -distance.x;
-        result += (distance.y>0) ? distance.y : -distance.y;
-        result += (distance.z>0) ? distance.z : -distance.z;
-
-        return result;
-    }
-
     public static bool IsIndexValid(IList array, int index){
         if(array==null) return false;
         return IsIndexValid(array.Count, index);
     }
     public static bool IsIndexValid(int max, int index){
         return (index >= 0 && index < max);
+    }
+
+    public static string TimestampToDate(long timestamp)
+    {
+        if(timestamp<0) return "";
+
+        DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+        dateTime = dateTime.AddMilliseconds((double)timestamp).ToLocalTime();
+        return dateTime.ToString("dd/mm/yyyy HH:mm:ss");
+    }
+
+    public static bool IsHovering(Button hoverable){
+        if(!hoverable.IsActive()) return false;
+
+        Vector3 cursor_pos = Actions.Cursor.Position();
+        Vector2 object_size = (hoverable.GetComponent<RectTransform>().sizeDelta/2f);
+
+        // corners
+        float left = hoverable.transform.position.x-object_size.x;
+        float right = hoverable.transform.position.x+object_size.x;
+
+        float bottom = hoverable.transform.position.y-object_size.y;
+        float top = hoverable.transform.position.y+object_size.y;
+
+        return ((cursor_pos.x>=left && cursor_pos.x<=right) && (cursor_pos.y>=bottom && cursor_pos.y<=top));
     }
 }

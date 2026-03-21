@@ -47,7 +47,7 @@ public class Selector : Window {
             Vector2 button_size = button.GetComponent<RectTransform>().sizeDelta;
 
             window.transform.position = this.transform.position + (Vector3.left * (button_size.x));
-            window.transform.position = new Vector3(window.transform.position.x, button.transform.position.y-button_size.y, window.transform.position.z);
+            window.transform.position = new Vector3(window.transform.position.x, window.transform.position.y+(button_size.y*button.transform.GetSiblingIndex()), window.transform.position.z);
         }
         else {
             foreach (Selector open_selector in current_selectors) open_selector.Hide();

@@ -44,7 +44,7 @@ public class Helper : Window, IClickable {
         }
         else {
             options.Show();
-            options.transform.position = icon.transform.position + (Vector3.left*this.icon.image.sprite.bounds.max.x*1000f*2f);
+            options.transform.position = icon.transform.position + (Vector3.left*this.icon.GetComponent<RectTransform>().sizeDelta.x);
         }
         yield break;
     }

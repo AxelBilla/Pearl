@@ -21,7 +21,7 @@ public class Newsletter : Menu {
     public Article.Data options_current;
 
     private Article.Data[] articles;
-    [SerializeField] public API.Information API_ACCESS = default;
+    [SerializeField] public API.Information API_ACCESS;
 
     void Start(){
         Hide();
