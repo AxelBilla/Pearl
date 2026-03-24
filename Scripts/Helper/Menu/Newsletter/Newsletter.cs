@@ -178,9 +178,6 @@ public class Newsletter : Menu {
             public static async Task<Article.Data[]> Articles(API.Information info) {
                 string res = await API.Request.Get(info, "newsletter");
                 Article.Data[] articles = JSON.Get<Article.Data[]>(res);
-                foreach (Article.Data t in articles){
-                    Debug.Log(t);
-                }
 
                 if(articles==null) articles = new Article.Data[]{new Article.Data("ERROR", res, -1, "",null)};
                 else if(articles.Length==0) articles = new Article.Data[]{new Article.Data("", "Nothing to see here, yet...", -1, "",null)};

@@ -29,7 +29,7 @@ public class Message : Window, IClickable {
 
         this.content.ForceMeshUpdate();
         if(this.content.isTextOverflowing) {
-            float height = this.content.textInfo.lineInfo[0].lineHeight*(this.content.textInfo.lineCount);
+            float height = this.content.textInfo.lineInfo[0].lineHeight*(this.content.textInfo.lineCount+1);
             this.context.image.rectTransform.sizeDelta = new Vector2(this.context.image.rectTransform.sizeDelta.x, height);
         }
     }
@@ -60,13 +60,13 @@ public class Message : Window, IClickable {
 
                 bool is_hovering_options = false;
                 foreach (Button option in option_buttons){
-                    if(Utils.IsHovering(option)){
+                    if(Utils.IsHovering(option.gameObject)){
                         is_hovering_options = true;
                         break;
                     }
                 }
-                if (Utils.IsHovering(this.context) && (!is_hovering_options)) {
-                    if(Actions.Cursor.Click() > 0f){
+                if (Utils.IsHovering(this.context.gameObject) && (!is_hovering_options)) {
+                    if(Actions.Cursor.RClick() > 0f){
 
                         bool is_same = (parent.options_current!=null && this.data!=null);
                         if(is_same) is_same = (parent.options_current.ToString()==this.data.ToString());
@@ -88,7 +88,7 @@ public class Message : Window, IClickable {
                             parent.options_current = this.data;
                             parent.options.transform.position = Actions.Cursor.Position();
                         }
-                        timer = 0.5f;
+                        timer = 2f;
                         yield break;
                     }
                 }

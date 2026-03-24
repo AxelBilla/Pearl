@@ -20,6 +20,8 @@ public class Window : MonoBehaviour {
         else Show();
     }
     public void Show(){
+        if(IsVisible()) return;
+
         this.gameObject.SetActive(true);
 
         active_windows.Add(this);
@@ -28,6 +30,8 @@ public class Window : MonoBehaviour {
     public virtual void Show_ExtendedBehaviour(){return;}
 
     public void Hide(){
+        if(!IsVisible()) return;
+
         Hide_ExtendedBehaviour();
         active_windows.Remove(this);
 
@@ -37,6 +41,8 @@ public class Window : MonoBehaviour {
 
 
     public static void Show(GameObject obj){
+        if(obj.activeSelf) return;
+
         Window win = obj.GetComponent<Window>();
         if(win!=null) active_windows.Add(win);
         obj.SetActive(true);
@@ -48,6 +54,8 @@ public class Window : MonoBehaviour {
     }
 
     public static void Hide(GameObject obj){
+        if(!obj.activeSelf) return;
+
         obj.SetActive(false);
         Window win = obj.GetComponent<Window>();
         if(win!=null) active_windows.Remove(win);
@@ -56,6 +64,30 @@ public class Window : MonoBehaviour {
         foreach (GameObject obj in objects){
             Window.Hide(obj);
         }
+    }
+
+    public static void Clear<T>(params Window[] to_exclude){
+        IList<Window> excluded = (IList<Window>)to_exclude;
+
+        if(Window.active_windows.Count>0) {
+            Window[] windows = new Window[Window.active_windows.Count];
+            Window.active_windows.CopyTo(windows);
+            foreach (Window window in windows) {
+                if(window.GetType()!=typeof(T) && typeof(T)!=typeof(Window)) continue;
+
+                if(excluded!=null && excluded.Contains(window)) continue;
+                else window.Hide();
+            }
+        }
+    }
+    public static void Clear(params Window[] to_exclude){
+        Clear<Window>(to_exclude);
+    }
+    public static bool Contains(Type type){
+        foreach (Window window in Window.active_windows) {
+            if(window.GetType() == type) return true;
+        }
+        return false;
     }
 
     private bool isTyping = false;

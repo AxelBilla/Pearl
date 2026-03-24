@@ -36,8 +36,6 @@ public class Utils {
     }
     public static void LoadScene(string name){
         if(SceneManager.GetActiveScene().name == name) return;
-
-        Debug.Log(name);
         SceneManager.LoadScene(name);
     }
     public static bool IsScene(string name){
@@ -75,22 +73,23 @@ public class Utils {
 
         DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
         dateTime = dateTime.AddMilliseconds((double)timestamp).ToLocalTime();
-        return dateTime.ToString("dd/mm/yyyy HH:mm:ss");
+        return dateTime.ToString("dd/MM/yyyy HH:mm:ss");
     }
 
-    public static bool IsHovering(Button hoverable){
-        if(!hoverable.IsActive()) return false;
-
+    public static bool IsHovering(GameObject hoverable){
         Vector3 cursor_pos = Actions.Cursor.Position();
         Vector2 object_size = (hoverable.GetComponent<RectTransform>().sizeDelta/2f);
 
+        return Utils.IsHovering(cursor_pos, hoverable.transform.position, object_size);
+    }
+    private static bool IsHovering(Vector3 position, Vector3 object_position, Vector2 object_size){
         // corners
-        float left = hoverable.transform.position.x-object_size.x;
-        float right = hoverable.transform.position.x+object_size.x;
+        float left = object_position.x-object_size.x;
+        float right = object_position.x+object_size.x;
 
-        float bottom = hoverable.transform.position.y-object_size.y;
-        float top = hoverable.transform.position.y+object_size.y;
+        float bottom = object_position.y-object_size.y;
+        float top = object_position.y+object_size.y;
 
-        return ((cursor_pos.x>=left && cursor_pos.x<=right) && (cursor_pos.y>=bottom && cursor_pos.y<=top));
+        return ((position.x>=left && position.x<=right) && (position.y>=bottom && position.y<=top));
     }
 }

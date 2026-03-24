@@ -37,7 +37,7 @@ public class Custom : Window{
     public static void Load(Selector owner, Custom.Data[] data){
         foreach (Custom.Data entry in data) {
             GameObject button = Utils.getPrefab(Path.Prefabs.Button);
-            DestroyImmediate(button.GetComponent<Window>(), true);
+            //DestroyImmediate(button.GetComponent<Window>(), true);
 
             Custom custom_button = button.AddComponent<Custom>();
             custom_button.Set(entry);

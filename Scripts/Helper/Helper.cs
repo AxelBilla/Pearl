@@ -35,12 +35,8 @@ public class Helper : Window, IClickable {
     }
 
     public IEnumerator OnClick(){
-        if(Window.active_windows.Count>0) {
-            Window[] windows = new Window[Window.active_windows.Count];
-            Window.active_windows.CopyTo(windows);
-            foreach (Window window in windows) {
-                if(window!=this) window.Hide();
-            }
+        if(Window.Contains(typeof(Selector))) {
+            Window.Clear<Selector>(this);
         }
         else {
             options.Show();
@@ -57,7 +53,15 @@ public class Helper : Window, IClickable {
             EventSystem.current.RaycastAll(eventData, results);
 
             #if !UNITY_EDITOR
-            Desktopia.Windows.Main.SetClickThrough(results.Count<=0);
+            if(results.Count>0) Desktopia.Windows.Main.SetClickThrough(false);
+            else {
+                Desktopia.Windows.Main.SetClickThrough(true);
+                if(Actions.Cursor.Click()>0f) Window.Clear<Selector>(this);
+            }
+            #else
+            if(results.Count<=0){
+                if(Actions.Cursor.Click()>0f) Window.Clear<Selector>(this);
+            }
             #endif
 
             yield return new WaitForEndOfFrame();

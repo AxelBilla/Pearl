@@ -18,12 +18,16 @@ public static class Actions
         public static float Click() {
             return InputSystem.actions.FindActionMap(Actions.Values.Maps.UI).FindAction(Actions.Values.Cursor.Click).ReadValue<float>();
         }
+        public static float RClick() {
+            return InputSystem.actions.FindActionMap(Actions.Values.Maps.UI).FindAction(Actions.Values.Cursor.RClick).ReadValue<float>();
+        }
     }
 
     public static class Values{
         public static class Cursor{
             public static string Move = "Look";
             public static string Click = "Click";
+            public static string RClick = "RightClick";
             public static string Position = "Position";
         }
 

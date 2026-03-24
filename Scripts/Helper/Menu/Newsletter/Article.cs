@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -26,13 +25,15 @@ public class Article : Window, IClickable {
         this.category.text = category;
         this.timestamp.text = Utils.TimestampToDate(timestamp);
         this.content.text = content + ((sources.Length>0) ? "\n\n" : "");
+
+        string link_hex = "BAE8FF";
         foreach (Article.Data.Source source in sources){
-            this.content.text += "\n["+source.name+"]("+source.score+"): <color=#0000EE>"+source.link+"</color>";
+            this.content.text += $"\n[{source.name}]({source.score}): <color=#{link_hex}>{source.link}</color>";
         }
 
         this.content.ForceMeshUpdate();
         if(this.content.isTextOverflowing) {
-            float height = this.content.textInfo.lineInfo[0].lineHeight*(this.content.textInfo.lineCount);
+            float height = this.content.textInfo.lineInfo[0].lineHeight*(this.content.textInfo.lineCount+1);
             this.context.image.rectTransform.sizeDelta = new Vector2(this.context.image.rectTransform.sizeDelta.x, height);
         }
     }
@@ -63,26 +64,24 @@ public class Article : Window, IClickable {
 
                 bool is_hovering_options = false;
                 foreach (Button option in option_buttons){
-                    if(Utils.IsHovering(option)){
+                    if(Utils.IsHovering(option.gameObject)){
                         is_hovering_options = true;
                         break;
                     }
                 }
-                if (Utils.IsHovering(this.context) && (!is_hovering_options)) {
-                    if(Actions.Cursor.Click() > 0f){
+                if (Utils.IsHovering(this.context.gameObject) && (!is_hovering_options)) {
+                    if(Actions.Cursor.RClick() > 0f){
 
                         bool is_same = (parent.options_current!=null && this.data!=null);
                         if(is_same) is_same = (parent.options_current.ToString()==this.data.ToString());
 
-                        Debug.Log(parent.options.IsVisible());
-                        Debug.Log(is_same);
                         if (parent.options.IsVisible() && is_same) parent.options.Hide();
                         else {
                             parent.options.Show();
                             parent.options_current = this.data;
                             parent.options.transform.position = Actions.Cursor.Position();
                         }
-                        timer = 0.5f;
+                        timer = 2f;
                         yield break;
                     }
                 }
