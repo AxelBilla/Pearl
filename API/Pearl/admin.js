@@ -50,10 +50,13 @@ export class Administration{
         }
         const condition = new Pair("id", body.id);
 
-        const data = {
+        let data = {
             "username": body.username,
-            "password": body.password,
         };
+
+        if(body.password!=null){
+            data.password = body.password;
+        }
         
         // Update admin status
         if(body.is_admin!=null){

@@ -132,7 +132,7 @@ app.post('/admin', async function(req, res){
   res.json(exec);
 })
 app.put('/admin', async function(req, res){
-  req.body.password = await bcrypt.hash(req.body.password, saltRounds);
+  if(req.body.password!=null) req.body.password = await bcrypt.hash(req.body.password, saltRounds);
 
   let auth = Authentication.ToJSON(req.headers);
   let has_access = await Authentication.HasAccess(auth);
