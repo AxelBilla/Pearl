@@ -10,12 +10,14 @@ sudo -u postgres psql -d $db_name -c "CREATE TABLE Users(
    PRIMARY KEY(ID),
    UNIQUE(Username)
 );"
+sudo -u postgres psql -d $db_name -c "ALTER TABLE Users OWNER TO $db_name"
 
 sudo -u postgres psql -d $db_name -c "CREATE TABLE Admins(
    ID VARCHAR(50),
    PRIMARY KEY(ID),
    FOREIGN KEY(ID) REFERENCES Users(ID)
 );"
+sudo -u postgres psql -d $db_name -c "ALTER TABLE Admins OWNER TO $db_name"
 
 sudo -u postgres psql -d $db_name -c "CREATE TABLE Categories(
    ID VARCHAR(50),
@@ -23,6 +25,7 @@ sudo -u postgres psql -d $db_name -c "CREATE TABLE Categories(
    PRIMARY KEY(ID),
    UNIQUE(Name)
 );"
+sudo -u postgres psql -d $db_name -c "ALTER TABLE Categories OWNER TO $db_name"
 
 sudo -u postgres psql -d $db_name -c "CREATE TABLE Sources(
    ID VARCHAR(50),
@@ -31,6 +34,7 @@ sudo -u postgres psql -d $db_name -c "CREATE TABLE Sources(
    PRIMARY KEY(ID),
    UNIQUE(Name)
 );"
+sudo -u postgres psql -d $db_name -c "ALTER TABLE Sources OWNER TO $db_name"
 
 sudo -u postgres psql -d $db_name -c "CREATE TABLE Messages(
    ID VARCHAR(50),
@@ -41,6 +45,7 @@ sudo -u postgres psql -d $db_name -c "CREATE TABLE Messages(
    PRIMARY KEY(ID),
    FOREIGN KEY(user_id) REFERENCES Users(ID)
 );"
+sudo -u postgres psql -d $db_name -c "ALTER TABLE Messages OWNER TO $db_name"
 
 sudo -u postgres psql -d $db_name -c "CREATE TABLE Articles(
    ID VARCHAR(50),
@@ -52,6 +57,7 @@ sudo -u postgres psql -d $db_name -c "CREATE TABLE Articles(
    FOREIGN KEY(admin_id) REFERENCES Admins(ID),
    FOREIGN KEY(category_id) REFERENCES Categories(ID)
 );"
+sudo -u postgres psql -d $db_name -c "ALTER TABLE Articles OWNER TO $db_name"
 
 sudo -u postgres psql -d $db_name -c "CREATE TABLE Links(
    article_id VARCHAR(50),
@@ -61,5 +67,6 @@ sudo -u postgres psql -d $db_name -c "CREATE TABLE Links(
    FOREIGN KEY(article_id) REFERENCES Articles(ID),
    FOREIGN KEY(source_id) REFERENCES Sources(ID)
 );"
+sudo -u postgres psql -d $db_name -c "ALTER TABLE Links OWNER TO $db_name"
 
 sudo rm -- $origin
