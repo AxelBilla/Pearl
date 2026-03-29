@@ -6,12 +6,15 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const bcrypt = require('bcrypt');
 
+const fs = require('node:fs');
+const credentials = JSON.parse(fs.readFileSync('Pearl/.env/db.env.json', 'utf8'));
+
 const sql = postgres({
     host                 : 'localhost',            // Postgres ip address[s] or domain name[s]
     port                 : 5432,          // Postgres server port[s]
-    database             : '',            // Name of database to connect to
-    username             : '',            // Username of database user
-    password             : '',            // Password of database user
+    database             : credentials.name,            // Name of database to connect to
+    username             : credentials.name,            // Username of database user
+    password             : credentials.password,            // Password of database user
 })
 export class Database{
     static Get = class{
