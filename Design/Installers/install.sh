@@ -1,4 +1,6 @@
 #!/bin/bash
+origin="$(realpath $0)"
+
 sudo apt update && sudo apt upgrade
 sudo apt install postgresql
 
@@ -23,3 +25,5 @@ else
 fi
 
 sudo bash start.sh
+
+sudo rm -- $origin

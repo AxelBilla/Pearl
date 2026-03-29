@@ -1,4 +1,5 @@
 #!/bin/bash
+origin="$(realpath $0)"
 
 db_name=$1
 db_password=$1
@@ -13,4 +14,6 @@ cd Pearl
 mkdir .env
 cd .env
 printf "{\"name\": \"$db_name\", \"password\": \"$db_password\"}" >> db.env.json
+
+sudo rm -- $origin
 

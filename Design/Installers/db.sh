@@ -1,4 +1,5 @@
 #!/bin/bash
+origin="$(realpath $0)"
 
 db_name=$1
 
@@ -60,3 +61,5 @@ sudo -u postgres psql -d $db_name -c "CREATE TABLE Links(
    FOREIGN KEY(article_id) REFERENCES Articles(ID),
    FOREIGN KEY(source_id) REFERENCES Sources(ID)
 );"
+
+sudo rm -- $origin
