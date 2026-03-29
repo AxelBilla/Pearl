@@ -14,7 +14,7 @@ sudo -u postgres psql -c "CREATE DATABASE $db_name OWNER $db_name;"
 sudo bash db.sh $db_name;
 
 clear
-read -p "Include API: " yn;
+read -p "Include API (Y/n): " yn;
 
 if [ "$yn" != "${yn#[Yy]}" ] ;then  
     sudo bash api.sh $db_name $db_password;
