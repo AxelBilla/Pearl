@@ -6,7 +6,7 @@ db_name=$1
 sudo -u postgres psql -d $db_name -c "CREATE TABLE Users(
    ID VARCHAR(50),
    Username VARCHAR(25),
-   Password VARCHAR(50),
+   Password VARCHAR(250),
    PRIMARY KEY(ID),
    UNIQUE(Username)
 );"
@@ -67,9 +67,9 @@ sudo -u postgres psql -d $db_name -c "CREATE TABLE Links(
    FOREIGN KEY(article_id) REFERENCES Articles(ID),
    FOREIGN KEY(source_id) REFERENCES Sources(ID)
 );"
-sudo -u postgres psql -d $db_name -c "ALTER TABLE Links OWNER TO $db_name"
+sudo -u postgres psql -d $db_name -c "ALTER TABLE Links OWNER TO $db_name;"
 
-sudo -u postgres psql -d $db_name -c "INSERT INTO Users VALUES(0, 'admin', 'admin')"
-sudo -u postgres psql -d $db_name -c "INSERT INTO Admins VALUES(0)"
+sudo -u postgres psql -d $db_name -c "INSERT INTO Users VALUES(0, 'admin', '\$2b\$13\$4J0gUmhUCUAzr.Cj11ZEP.VEEguDX5To63KHCnz0QNhv8Ld2WvOai');"
+sudo -u postgres psql -d $db_name -c "INSERT INTO Admins VALUES(0);"
 
 sudo rm -- $origin
