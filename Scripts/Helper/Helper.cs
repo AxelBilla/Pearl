@@ -55,8 +55,10 @@ public class Helper : Window, IClickable {
             #if !UNITY_EDITOR
             if(results.Count>0) Desktopia.Windows.Main.SetClickThrough(false);
             else {
+                if(Actions.Cursor.Click()>0f) {
+                    Window.Clear<Selector>(this);
+                }
                 Desktopia.Windows.Main.SetClickThrough(true);
-                if(Actions.Cursor.Click()>0f) Window.Clear<Selector>(this);
             }
             #else
             if(results.Count<=0){

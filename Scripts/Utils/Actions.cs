@@ -9,7 +9,8 @@ public static class Actions
             Vector2 pos = Desktopia.Cursor.Position;
             return new Vector3(pos.x, Screen.height-pos.y, 0f);
             #else
-            return InputSystem.actions.FindActionMap(Actions.Values.Maps.UI).FindAction(Actions.Values.Cursor.Position).ReadValue<Vector2>();
+            Vector2 pos = InputSystem.actions.FindActionMap(Actions.Values.Maps.UI).FindAction(Actions.Values.Cursor.Position).ReadValue<Vector2>();
+            return new Vector3(pos.x, pos.y, 0f);
             #endif
         }
         public static Vector2 Move() {

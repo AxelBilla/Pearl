@@ -64,16 +64,13 @@ export class Database{
         static async Access(auth){
             const users = await Database.Get.Field("users", "password", new Pair("username", auth.username));
             for(let user in users){
-                if(bcrypt.compare(auth.password, users[user].password)) return true;
+                if(await bcrypt.compare(auth.password, users[user].password)) return true;
             }
             return false;
         }
         static async ID(auth){
-            const users = await Database.Get.Table("users", "id", -1, new Pair("username", auth.username));
-            for(let user in users){
-                if(bcrypt.compare(auth.password, users[user].password)) return users[user].id;
-            }
-            return null;
+            const users = await Database.Get.Table("users", "id", 1, new Pair("username", auth.username));
+            return users[0].id;
         }
         static async Name(id){
             return (await Database.Get.Field("users", "username", new Pair("id", id)))[0].username;

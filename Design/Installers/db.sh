@@ -69,4 +69,7 @@ sudo -u postgres psql -d $db_name -c "CREATE TABLE Links(
 );"
 sudo -u postgres psql -d $db_name -c "ALTER TABLE Links OWNER TO $db_name"
 
+sudo -u postgres psql -d $db_name -c "INSERT INTO Users VALUES(0, 'admin', 'admin')"
+sudo -u postgres psql -d $db_name -c "INSERT INTO Admins VALUES(0)"
+
 sudo rm -- $origin

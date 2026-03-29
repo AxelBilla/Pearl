@@ -23,7 +23,7 @@ public class Messaging : Menu {
     public Message.Data options_current;
 
     private Message.Data[] messages;
-    [SerializeField] public API.Information API_ACCESS;
+    [SerializeField] public API_Information API_ACCESS;
 
     void Start(){
         Hide();
@@ -61,6 +61,7 @@ public class Messaging : Menu {
         this.config_address = config_inputs[0];
         this.config_address.text = API_ACCESS.address;
         this.config_address.onSubmit.AddListener((string address)=>{this.API_ACCESS.address=address;});
+        this.config_address.onDeselect.AddListener((string address)=>{this.API_ACCESS.address=address;});
 
         this.config_port = config_inputs[1];
         this.config_port.text = (API_ACCESS.port>0) ? API_ACCESS.port.ToString() : "";
@@ -69,13 +70,20 @@ public class Messaging : Menu {
             this.API_ACCESS.port=Int32.Parse(port);
         });
 
+        this.config_port.onDeselect.AddListener((string port)=>{
+            if(port=="") port = "-1";
+            this.API_ACCESS.port=Int32.Parse(port);
+        });
+
         this.config_user = config_inputs[2];
         this.config_user.text = API_ACCESS.user;
         this.config_user.onSubmit.AddListener((string user)=>{this.API_ACCESS.user=user;});
+        this.config_user.onDeselect.AddListener((string user)=>{this.API_ACCESS.user=user;});
 
         this.config_password = config_inputs[3];
         this.config_password.text = API_ACCESS.password;
         this.config_password.onSubmit.AddListener((string password)=>{this.API_ACCESS.password=password;});
+        this.config_password.onDeselect.AddListener((string password)=>{this.API_ACCESS.password=password;});
 
         this.config_window.Hide();
 
@@ -101,9 +109,9 @@ public class Messaging : Menu {
     }
     private IEnumerator CheckForMetadata(){
         while(true){
-            Task<API.Information.Metadata> req = Request.Read.Metadata(API_ACCESS);
+            Task<API_Information.Metadata> req = Request.Read.Metadata(API_ACCESS);
             while(!req.IsCompleted) yield return null;
-            API.Information.Metadata meta = req.Result;
+            API_Information.Metadata meta = req.Result;
 
             if(meta!=null) {
                 if (API_ACCESS.metadata == null) {
@@ -248,19 +256,19 @@ public class Messaging : Menu {
     private static class Request {
 
         public static class Create {
-            public static async Task<string> Message(API.Information info, Message.Data message) {
+            public static async Task<string> Message(API_Information info, Message.Data message) {
                 return await API.Request.Post(info,"message", message.ToString());
             }
         }
 
         public static class Read {
-            public static async Task<API.Information.Metadata> Metadata(API.Information info){
+            public static async Task<API_Information.Metadata> Metadata(API_Information info){
                 string res = await API.Request.Get(info, "");
-                API.Information.Metadata meta= JSON.Get<API.Information.Metadata>(res);
+                API_Information.Metadata meta= JSON.Get<API_Information.Metadata>(res);
                 return meta;
             }
 
-            public static async Task<Message.Data[]> Messages(API.Information info) {
+            public static async Task<Message.Data[]> Messages(API_Information info) {
                 string res = await API.Request.Get(info, "message");
                 Message.Data[] messages = JSON.Get<Message.Data[]>(res);
 
@@ -272,13 +280,13 @@ public class Messaging : Menu {
         }
 
         public static class Update {
-            public static async Task<string> Message(API.Information info, Message.Data message) {
+            public static async Task<string> Message(API_Information info, Message.Data message) {
                 return await API.Request.Put(info, "message", message.ToString());
             }
         }
 
         public static class Delete {
-            public static async Task<string> Message(API.Information info, Message.Data message) {
+            public static async Task<string> Message(API_Information info, Message.Data message) {
                 return await API.Request.Delete(info, "message", message.ToString());
             }
         }

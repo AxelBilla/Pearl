@@ -8,8 +8,8 @@ public class DraggableWindow : Window {
     private protected virtual IEnumerator Drag(){
         bool is_moving = false;
         while(true){
-            float is_holding = Actions.Cursor.Click();
-            if(!is_moving && is_holding>0f && Utils.IsHovering(drag_area.gameObject)) {
+            bool is_holding = Actions.Cursor.Click() > 0f;
+            if(!is_moving && is_holding && Utils.IsHovering(drag_area.gameObject)) {
                 if(DraggableWindow.current == null) {
                     DraggableWindow.current = this;
                     is_moving = true;
@@ -17,7 +17,7 @@ public class DraggableWindow : Window {
             }
 
             if(is_moving) {
-                if (is_holding > 0f) {
+                if (is_holding) {
                     Vector2 move = Actions.Cursor.Move();//*Time.unscaledDeltaTime;
                     this.transform.position += (Vector3.right * move.x) + (Vector3.up * move.y);
                 }
@@ -30,6 +30,9 @@ public class DraggableWindow : Window {
         }
     }
 
+    void OnDisable(){
+        if(current==this) current = null;
+    }
 
     private static DraggableWindow current = null;
 }

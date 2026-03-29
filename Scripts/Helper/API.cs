@@ -7,24 +7,24 @@ public static class API {
     public static class Request{
 
         // Read
-        public static async Task<string> Get(API.Information info, string endpoint)
+        public static async Task<string> Get(API_Information info, string endpoint)
         {
             return await Send(Request.Type.GET, endpoint, "", info.user, info.password, info.address, info.port);
         }
 
         // Content = JSON
         // Create
-        public static async Task<string> Post(API.Information info, string endpoint, string content)
+        public static async Task<string> Post(API_Information info, string endpoint, string content)
         {
             return await Send(Request.Type.POST, endpoint, content, info.user, info.password, info.address, info.port);
         }
         // Update
-        public static async Task<string> Put(API.Information info, string endpoint, string content)
+        public static async Task<string> Put(API_Information info, string endpoint, string content)
         {
             return await Send(Request.Type.PUT, endpoint, content, info.user, info.password, info.address, info.port);
         }
         // Delete
-        public static async Task<string> Delete(API.Information info, string endpoint, string content)
+        public static async Task<string> Delete(API_Information info, string endpoint, string content)
         {
             return await Send(Request.Type.DELETE, endpoint, content, info.user, info.password, info.address, info.port);
         }
@@ -71,26 +71,6 @@ public static class API {
             DELETE,
             PUT,
             POST,
-        }
-    }
-
-    [CreateAssetMenu(fileName = "Information", menuName = "Pearl/API/Information")]
-    public class Information : ScriptableObject{
-        public string address = "localhost";
-        public int port = -1;
-
-        public string user = "";
-        public string password = "";
-
-        public Metadata metadata = null;
-
-        public override string ToString(){
-            return "{"+$"address:\"{address}\", port:\"{port}\", user:\"{user}\", password:\"{password}\""+"}";
-        }
-
-        public class Metadata{
-            public string id = "";
-            public bool is_admin = false;
         }
     }
 }

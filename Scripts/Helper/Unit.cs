@@ -10,7 +10,7 @@ public class Unit : MonoBehaviour{
         else Destroy(this);
     }
 
-    [SerializeField] private API.Information[] API_ACCESS;
+    [SerializeField] private API_Information[] API_ACCESS;
 
     void Start(){
         StartCoroutine(StartTesting());
@@ -18,14 +18,14 @@ public class Unit : MonoBehaviour{
 
     private IEnumerator StartTesting(){
         Debug.Log("== START ==");
-        foreach (API.Information ACCESS in API_ACCESS){
+        foreach (API_Information ACCESS in API_ACCESS){
             yield return StartCoroutine(Run(ACCESS));
             Debug.Log("");
         }
         Debug.Log("=== END ===");
     }
 
-    private IEnumerator Run(API.Information api){
+    private IEnumerator Run(API_Information api){
         Debug.Log("["+api.name+"]: "+api.user+" - "+api.address);
 
         Debug.Log("CREATE:");
@@ -50,19 +50,19 @@ public class Unit : MonoBehaviour{
     }
 
     private static class Create {
-        public static IEnumerator Message(API.Information api) {
+        public static IEnumerator Message(API_Information api) {
             yield break;
         }
-        public static IEnumerator Newsletter(API.Information api) {
+        public static IEnumerator Newsletter(API_Information api) {
             yield break;
         }
-        public static IEnumerator Admin(API.Information api) {
+        public static IEnumerator Admin(API_Information api) {
             yield break;
         }
     }
 
     private static class Read {
-        public static IEnumerator Message(API.Information api) {
+        public static IEnumerator Message(API_Information api) {
             Task<string> res = API.Request.Get(api, "message");
             while (!res.IsCompleted) yield return null;
 
@@ -70,7 +70,7 @@ public class Unit : MonoBehaviour{
             if(res_data!=null && res_data.Length>0) Debug.Log("Working!");
             else Debug.Log("Error!\n"+res.Result);
         }
-        public static IEnumerator Newsletter(API.Information api) {
+        public static IEnumerator Newsletter(API_Information api) {
             Task<string> res = API.Request.Get(api, "newsletter");
             while (!res.IsCompleted) yield return null;
 
@@ -78,7 +78,7 @@ public class Unit : MonoBehaviour{
             if(res_data!=null && res_data.Length>0) Debug.Log("Working!");
             else Debug.Log("Error!\n"+res.Result);
         }
-        public static IEnumerator Users(API.Information api) {
+        public static IEnumerator Users(API_Information api) {
             Task<string> res = API.Request.Get(api, "users");
             while (!res.IsCompleted) yield return null;
 
@@ -86,7 +86,7 @@ public class Unit : MonoBehaviour{
             if(res_data.HasValues) Debug.Log("Working!");
             else Debug.Log("Error!\n"+res.Result);
         }
-        public static IEnumerator Admin(API.Information api) {
+        public static IEnumerator Admin(API_Information api) {
             Task<string> res = API.Request.Get(api, "admin");
             while (!res.IsCompleted) yield return null;
 
@@ -97,7 +97,7 @@ public class Unit : MonoBehaviour{
     }
 
     private static class Update {
-        public static IEnumerator Message(API.Information api) {
+        public static IEnumerator Message(API_Information api) {
             Task<string> res = API.Request.Get(api, "message");
             while (!res.IsCompleted) yield return null;
 
@@ -123,7 +123,7 @@ public class Unit : MonoBehaviour{
             }
             else Debug.Log("Error!\n"+res.Result);
         }
-        public static IEnumerator Admin(API.Information api) {
+        public static IEnumerator Admin(API_Information api) {
 
             Task<string> res = API.Request.Get(api, "users");
             while (!res.IsCompleted) yield return null;
@@ -162,13 +162,13 @@ public class Unit : MonoBehaviour{
     }
     
     private static class Delete {
-        public static IEnumerator Message(API.Information api) {
+        public static IEnumerator Message(API_Information api) {
             yield break;
         }
-        public static IEnumerator Newsletter(API.Information api) {
+        public static IEnumerator Newsletter(API_Information api) {
             yield break;
         }
-        public static IEnumerator Admin(API.Information api) {
+        public static IEnumerator Admin(API_Information api) {
             yield break;
         }
     }
