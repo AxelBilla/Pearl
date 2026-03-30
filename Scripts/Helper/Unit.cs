@@ -51,13 +51,73 @@ public class Unit : MonoBehaviour{
 
     private static class Create {
         public static IEnumerator Message(API_Information api) {
-            yield break;
+
+            Task<string> res = API.Request.Get(api, "message");
+            while (!res.IsCompleted) yield return null;
+            int length = JSON.Get<Message.Data[]>(res.Result).Length;
+
+            res = API.Request.Post(api, "message", "{\"content\":\"test creation\"}");
+            while (!res.IsCompleted) yield return null;
+            Message.Data test_message = JSON.Get<Message.Data>(res.Result);
+
+
+            res = API.Request.Get(api, "message");
+            while (!res.IsCompleted) yield return null;
+            int new_length = JSON.Get<Message.Data[]>(res.Result).Length;
+
+
+            if(length!=null && new_length!=null && length>new_length) Debug.Log("Working!");
+            else Debug.Log("Error!\n"+length+" <= "+new_length);
+
+            API.Request.Delete(api, "message", "{\"id\":\""+test_message.id+"\"}");
         }
         public static IEnumerator Newsletter(API_Information api) {
-            yield break;
+
+            Task<string> res = API.Request.Get(api, "newsletter");
+            while (!res.IsCompleted) yield return null;
+            int length = JSON.Get<Message.Data[]>(res.Result).Length;
+
+            API.Request.Post(api, "newsletter", "{\"content\": \"Test article deletion\", \"category\": \"Test deletion\", \"sources\": [{\"name\": \"Test\", \"score\": 0, \"link\": \"n/a\"}]}");
+            while (!res.IsCompleted) yield return null;
+            Article.Data test_article = JSON.Get<Article.Data>(res.Result);
+
+            res = API.Request.Get(api, "newsletter");
+            while (!res.IsCompleted) yield return null;
+
+            int new_length = JSON.Get<Message.Data[]>(res.Result).Length;
+
+            if(length!=null && new_length!=null && length>new_length) Debug.Log("Working!");
+            else Debug.Log("Error!\n"+length+" <= "+new_length);
+            
+            API.Request.Delete(api, "newsletter", "{\"id\":\""+test_article.id+"\"}");
         }
         public static IEnumerator Admin(API_Information api) {
-            yield break;
+            Task<string> res = API.Request.Get(api, "users");
+            while (!res.IsCompleted) yield return null;
+            int user_length = JSON.Get<User[]>(res.Result).Length;
+
+            res = API.Request.Get(api, "admin");
+            while (!res.IsCompleted) yield return null;
+            int admin_length = JSON.Get<User.Admin[]>(res.Result).Length;
+
+            res = API.Request.Post(api, "admin", "{\"username\": \"test_new_acc\",\"password\": \"test_new_acc\",\"is_admin\": true}");
+            while (!res.IsCompleted) yield return null;
+            User test_user = JSON.Get<User>(res.Result);
+
+            res = API.Request.Get(api, "users");
+            while (!res.IsCompleted) yield return null;
+            int new_user_length = JSON.Get<User[]>(res.Result).Length;
+
+            res = API.Request.Get(api, "admin");
+            while (!res.IsCompleted) yield return null;
+            int new_admin_length = JSON.Get<User.Admin[]>(res.Result).Length;
+
+            if(user_length!=null && new_user_length!=null && admin_length!=null && new_admin_length!=null && user_length<=new_user_length && admin_length<=new_admin_length){
+                Debug.Log("Working!");
+            }
+            else Debug.Log("Error!\n"+user_length+" > "+new_user_length+" /OR/ "+admin_length+" > "+new_admin_length);
+
+            API.Request.Delete(api, "message", "{\"id\":\""+test_user.id+"\"}");
         }
     }
 
@@ -163,13 +223,95 @@ public class Unit : MonoBehaviour{
     
     private static class Delete {
         public static IEnumerator Message(API_Information api) {
-            yield break;
+            Task<string> res = API.Request.Post(api, "message", "{\"content\":\"test deletion\"}");
+            while (!res.IsCompleted) yield return null;
+            Message.Data test_message = JSON.Get<Message.Data>(res.Result);
+
+            res = API.Request.Get(api, "message");
+            while (!res.IsCompleted) yield return null;
+
+            int length = JSON.Get<Message.Data[]>(res.Result).Length;
+
+            res = API.Request.Delete(api, "message", "{\"id\":\""+test_message.id+"\"}");
+            while (!res.IsCompleted) yield return null;
+
+
+            res = API.Request.Get(api, "message");
+            while (!res.IsCompleted) yield return null;
+
+            int new_length = JSON.Get<Message.Data[]>(res.Result).Length;
+
+
+            if(length!=null && new_length!=null && length>new_length) Debug.Log("Working!");
+            else Debug.Log("Error!\n"+length+" <= "+new_length);
         }
         public static IEnumerator Newsletter(API_Information api) {
-            yield break;
+            Task<string> res = API.Request.Post(api, "newsletter", "{\"content\": \"Test article deletion\", \"category\": \"Test deletion\", \"sources\": [{\"name\": \"Test\", \"score\": 0, \"link\": \"n/a\"}]}");
+            while (!res.IsCompleted) yield return null;
+            Article.Data test_article = JSON.Get<Article.Data>(res.Result);
+
+            res = API.Request.Get(api, "newsletter");
+            while (!res.IsCompleted) yield return null;
+
+            int length = JSON.Get<Message.Data[]>(res.Result).Length;
+
+            res = API.Request.Delete(api, "newsletter", "{\"id\":\""+test_article.id+"\"}");
+            while (!res.IsCompleted) yield return null;
+
+
+            res = API.Request.Get(api, "newsletter");
+            while (!res.IsCompleted) yield return null;
+
+            int new_length = JSON.Get<Message.Data[]>(res.Result).Length;
+
+
+            if(length!=null && new_length!=null && length>new_length) Debug.Log("Working!");
+            else Debug.Log("Error!\n"+length+" <= "+new_length);
         }
         public static IEnumerator Admin(API_Information api) {
-            yield break;
+
+            Task<string> res = API.Request.Post(api, "admin", "{\"username\": \"test_new_acc\",\"password\": \"test_new_acc\",\"is_admin\": true}");
+            while (!res.IsCompleted) yield return null;
+            User test_user = JSON.Get<User>(res.Result);
+
+            res = API.Request.Get(api, "users");
+            while (!res.IsCompleted) yield return null;
+            int user_length = JSON.Get<User[]>(res.Result).Length;
+
+            res = API.Request.Get(api, "admin");
+            while (!res.IsCompleted) yield return null;
+            int admin_length = JSON.Get<User.Admin[]>(res.Result).Length;
+
+            res = API.Request.Delete(api, "message", "{\"id\":\""+test_user.id+"\"}");
+            while (!res.IsCompleted) yield return null;
+
+            res = API.Request.Get(api, "users");
+            while (!res.IsCompleted) yield return null;
+            int new_user_length = JSON.Get<User[]>(res.Result).Length;
+
+            res = API.Request.Get(api, "admin");
+            while (!res.IsCompleted) yield return null;
+            int new_admin_length = JSON.Get<User.Admin[]>(res.Result).Length;
+
+            if(user_length!=null && new_user_length!=null && admin_length!=null && new_admin_length!=null && user_length>new_user_length && admin_length>new_admin_length) Debug.Log("Working!");
+            else Debug.Log("Error!\n"+user_length+" <= "+new_user_length+" /OR/ "+admin_length+" <= "+new_admin_length);
+        }
+    }
+
+    private class User{
+        public string id;
+        public string name;
+        public bool is_admin;
+        public User(string id, string name, bool is_admin){
+            this.id = id;
+            this.name = name;
+            this.is_admin = is_admin;
+        }
+        public class Admin{
+            public string id;
+            public Admin(string id) {
+                this.id = id;
+            }
         }
     }
 }
