@@ -12,6 +12,10 @@
   <br>
   <br>
   <br>
+  <br>
+  <img src="https://www.billiard.dev/assets/images/Pearl.png">
+  <br>
+  <br>
   The use of a Reverse Proxy is recommended.
 </p>
 <h1 align="center">Documentation</h1>
